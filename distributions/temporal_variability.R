@@ -25,13 +25,13 @@ ui = dashboardPage(
                 value = 12,
                 min = 1,
                 max = 12*10,
-                step = 1),
-    sliderInput(label =  "NB_size parameter",
-                inputId = "size_parameter",
-                value = 0.5,
-                min = 0.1,
-                max = 10,
-                step = 0.1)
+                step = 1)
+    # sliderInput(label =  "NB_size parameter",
+    #             inputId = "size_parameter",
+    #             value = 0.75,
+    #             min = 0.1,
+    #             max = 10,
+    #             step = 0.1)
   ),
   dashboardBody(
     tabBox(
@@ -51,16 +51,16 @@ ui = dashboardPage(
 server = function(input, output){
   
   output$result = renderPlotly({
-    size_parameter = input$size_parameter
+    #size_parameter = input$size_parameter
     mean_1 = input$mean_1
     mean_2 = input$mean_2
     sample_size = 120
     
     my_data = data.frame(i = 1:sample_size, rnd = runif(sample_size)) 
-    my_data$y = qnbinom(p = my_data$rnd,mu = mean_1, size = size_parameter)
+    my_data$y = qnbinom(p = my_data$rnd,mu = mean_1, size = mean_1/10)
     
     my_data_2 = data.frame(i = 1:sample_size, rnd = runif(sample_size)) 
-    my_data_2$y = qnbinom(p = my_data_2$rnd, mu = mean_2, size = size_parameter)
+    my_data_2$y = qnbinom(p = my_data_2$rnd, mu = mean_2, size = mean_2/10)
     
     
     interval = input$interval
@@ -90,16 +90,16 @@ server = function(input, output){
   })
   
   output$histogram = renderPlotly({
-    size_parameter = input$size_parameter
+    #size_parameter = input$size_parameter
     mean_1 = input$mean_1
     mean_2 = input$mean_2
     sample_size = 120
     
     my_data = data.frame(i = 1:sample_size, rnd = runif(sample_size)) 
-    my_data$y = qnbinom(p = my_data$rnd,mu = mean_1, size = size_parameter)
+    my_data$y = qnbinom(p = my_data$rnd,mu = mean_1, size = mean_1/10)
     
     my_data_2 = data.frame(i = 1:sample_size, rnd = runif(sample_size)) 
-    my_data_2$y = qnbinom(p = my_data_2$rnd, mu = mean_2, size = size_parameter)
+    my_data_2$y = qnbinom(p = my_data_2$rnd, mu = mean_2, size = mean_2/10)
     
     my_data = my_data %>% mutate(type = "raw data") %>% mutate(location = "1")
     my_data_2 = my_data_2 %>% mutate(type = "raw data") %>% mutate(location = "2")
