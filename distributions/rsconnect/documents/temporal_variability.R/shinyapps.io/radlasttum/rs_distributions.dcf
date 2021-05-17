@@ -1,0 +1,12 @@
+name: rs_distributions
+title: rs_distributions
+username:
+account: radlasttum
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4068871
+bundleId: 4606133
+url: https://radlasttum.shinyapps.io/rs_distributions/
+when: 1621236463.19581
+asMultiple: FALSE
+asStatic: FALSE
