@@ -5,9 +5,9 @@ account: radlasttum
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 4069131
-bundleId: 4549634
+bundleId: 4607177
 url: https://radlasttum.shinyapps.io/regression/
-when: 1620032706.11008
+when: 1621255194.0763
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: Mod2.2.Ex3.Dataset.xlsx

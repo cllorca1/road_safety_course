@@ -50,12 +50,15 @@ ui = dashboardPage(
                 value =1,
                 min = 0,
                 max = 2,
-                step = 0.01)
+                step = 0.01),
+    valueBoxOutput("sumSqr", width = 300),
+    valueBoxOutput("logLike", width = 300)
   ),
   dashboardBody(
     tabBox(
       tabPanel(
         title = "Linear model results y-y_est",
+        valueBoxOutput("lm_eq", width = "100%"),
         plotlyOutput("result", width = "100%")
       ), 
       tabPanel(
@@ -76,6 +79,7 @@ ui = dashboardPage(
       ),
       tabPanel(
         title = "Poisson log-linear model results y-y_est",
+        valueBoxOutput("poisson_eq", width = "100%"),
         plotlyOutput("result_poisson", width = "100%")
       ), 
       tabPanel(
@@ -111,7 +115,8 @@ server = function(input, output, session){
     ggplot(dataset, aes(x = Crashes, y = Crashes_est)) + geom_point() +
       geom_abline(intercept = 0, slope = 1, color = "red") + 
       xlab("Observed") +
-      ylab("Estimated")
+      ylab("Estimated") + 
+      xlim(0,120) + ylim(0,120)
     ggplotly(height = 800)
   })
   
@@ -128,9 +133,34 @@ server = function(input, output, session){
            aes(x = AADT, y = Crash_est, group = l, color = as.factor(l))) + geom_path() +
       xlab("AADT") +
       ylab("Estimated number of crashes") + 
-      geom_hline(yintercept = 0, color = "red")
-    ggplotly(height = 800)
+      geom_hline(yintercept = 0, color = "red") + 
+      geom_point(mapping = aes(x = AADT, y = Crashes), inherit.aes = F) + 
+      ylim(0,120)
+    ggplotly(height = 800) 
   })
+  
+  
+  output$sumSqr = renderValueBox({
+    a = input$a
+    b = input$b
+    c = input$c
+    
+    dataset  = dataset %>% mutate(Crashes_est = a + b * AADT/10000 + c * L)
+    dataset$sq_error = (dataset$Crashes - dataset$Crashes_est)^2
+    valueBox(subtitle = "Sum of squares (linear model)", round(sum(dataset$sq_error), 0))
+  })
+  
+  output$lm_eq = renderValueBox({
+    a = round(input$a,2)
+    b = round(input$b,2)
+    c = round(input$c,2)
+    
+    eq = paste(a, "+", b, "*AADT/10000 +", c, "*L")
+    
+    valueBox(subtitle = "Linear model equation", eq)
+  })
+  
+  
   
   output$result_poisson = renderPlotly({
     beta0 = input$beta0
@@ -143,7 +173,8 @@ server = function(input, output, session){
     ggplot(dataset, aes(x = Crashes, y = Crashes_est)) + geom_point() +
       geom_abline(intercept = 0, slope = 1, color = "red") + 
       xlab("Observed") +
-      ylab("Estimated")
+      ylab("Estimated") + 
+      xlim(0,120) + ylim(0,120)
     ggplotly(height = 800)
   })
   
@@ -165,9 +196,36 @@ server = function(input, output, session){
            aes(x = AADT, y = Crashes_est, group = l, color = as.factor(l))) + geom_path() +
       xlab("AADT") +
       ylab("Estimated number of crashes") + 
-      geom_hline(yintercept = 0, color = "red")
+      geom_hline(yintercept = 0, color = "red") + 
+      geom_point(mapping = aes(x = AADT, y = Crashes), inherit.aes = F) + 
+      ylim(0,120)
     ggplotly(height = 800)
   })
+  
+  output$logLike = renderValueBox({
+    beta0 = input$beta0
+    beta1 = input$beta1
+    beta2 = input$beta2
+    
+    dataset  = dataset %>% mutate(Crashes_est = exp(beta0) * AADT ^ beta1 * L ^ beta2)
+    
+    
+    dataset$p_log = log(exp(-dataset$Crashes_est) * (dataset$Crashes_est)^(dataset$Crashes) / factorial(dataset$Crashes))
+    
+    
+    valueBox(subtitle = "Log likelihood (Poisson model)", round(sum(dataset$p_log),0))
+  })
+  
+  output$poisson_eq = renderValueBox({
+    a = round(input$beta0,2)
+    b = round(input$beta1,2)
+    c = round(input$beta2,2)
+    
+    eq = paste("exp(", a, ") *AADT^",b, "*L^", c, sep = "")
+    
+    valueBox(subtitle = "Poisson log-linear model equation", eq)
+  })
+  
   
   
   
